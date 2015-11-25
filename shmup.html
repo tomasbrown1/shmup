@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			* {
+				padding: 0px;
+				margin: 0px;
+			}
+
+			canvas {
+				background-image: url(http://entropymag.org/wp-content/uploads/2014/10/outer-space-wallpaper-pictures.jpg);
+				display: block;
+				margin: 0 auto;
+			}
+		</style>
+	</head>
+	<body>
+
+		<canvas id='myCanvas' height='700' width='700'></canvas>
+
+
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script>
+			var canvas = document.getElementById('myCanvas');
+			var ctx = canvas.getContext('2d');
+			var playerX = canvas.width / 2;
+			var playerY = canvas.height - 75;
+			var enemyDir = 3;
+			var enemyX = 0;
+			var enemyY = canvas.height / 4;
+			var ammoX;
+			var ammoY;
+			var ammoDir = -5;
+			var goLeft = false;
+			var goRight = false;
+			var score = 0;
+
+			function drawPlayer() {
+				ctx.beginPath();
+				ctx.moveTo(playerX, playerY);
+				ctx.lineTo(playerX + 25, playerY + 50);
+				ctx.lineTo(playerX - 25, playerY + 50);
+				ctx.fillStyle = '#D7E519';
+				ctx.fill();
+				ctx.closePath();
+			}
+
+			function drawEnemy() {
+				ctx.beginPath();
+				ctx.arc(enemyX, enemyY, 25, 0, Math.PI*2, false);
+				ctx.fillStyle = '#FF0000';
+				ctx.fill();
+				ctx.closePath();
+			}
+
+			function shoot() {
+				ctx.beginPath();
+				ctx.rect(playerX, PlayerY, 6, 25);
+				ctx.fillStyle = '#FF7200'
+				ctx.fill();
+				ctx.closePath();
+			}
+
+			function hit() {
+				if (ammoY < enemyY + 25 && ammoY > enemyY - 25 && ammoX < enemyX + 25 && ammoX > enemyX - 25) {
+					score++;
+					shoot = false;
+					enemyX = 0;
+					ammoY = canvas.height - 50;
+				}
+			}
+
+			function draw() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				drawEnemy();
+				drawPlayer();
+				drawScore();
+				shoot();
+				ammoY += ammoDir;
+				if (ammoY < 0) {
+					shoot = false;
+					ammoY = canvas.height - 50;
+				}
+				enemyX += enemyDir;
+				if (enemyX > canvas.width + 25) {
+					enemyX = 0;
+				}
+				if (goLeft == true && playerX > 0) {
+					playerX -= 7;
+					ammoX -= 7;
+				}
+				if (goRight == true && playerX < canvas.width) {
+					playerX += 7;
+					ammoX += 7;
+				}
+				requestAnimationFrame(draw);
+			}
+			
+			document.addEventListener('keydown', keyDownHandler, false);
+			document.addEventListener('keyup', keyUpHandler, false);
+			function keyDownHandler(e) {
+				if (e.keyCode == 32) {
+					shoot();
+				} else if (e.keyCode == 37) {
+					goLeft = true;
+				} else if (e.keyCode == 39) {
+					goRight = true;
+				}
+			}
+			function keyUpHandler(e) {
+				if (e.keyCode == 37) {
+					goLeft = false;
+				} else if (e.keyCode == 39) {
+					goRight = false;
+				}
+			}
+
+			function drawScore() {
+				ctx.font = '16px Arial';
+				ctx.fillStyle = '#0095DD';
+				ctx.fillText('Score: ' + score, 8, 20);
+			}
+
+			draw();
+		</script>
+	</body>
+</html>
